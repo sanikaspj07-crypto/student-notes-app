@@ -87,3 +87,16 @@ button:hover{
     font-size:18px;
     font-weight:700;
 }
+
+/* Footer styles */
+.site-footer{
+    width:500px;
+    background:white;
+    color:#666;
+    padding:12px 20px;
+    border-radius:10px;
+    margin-top:18px;
+    text-align:center;
+    box-shadow:0px 2px 8px rgba(0,0,0,0.06);
+    font-size:14px;
+}
