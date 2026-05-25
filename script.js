@@ -81,7 +81,8 @@ function normalizeNotes(){
                 content: lines.slice(1).join('\n') || lines[0] || '',
                 tags: [],
                 subject: '',
-                pinned: false
+                pinned: false,
+                favorite: false
             };
         }
         // Already structured, ensure keys exist
@@ -91,7 +92,8 @@ function normalizeNotes(){
             content: n.content || '',
             tags: Array.isArray(n.tags) ? n.tags : (n.tags ? String(n.tags).split(',').map(s=>s.trim()).filter(Boolean) : []),
             subject: n.subject || '',
-            pinned: !!n.pinned
+            pinned: !!n.pinned,
+            favorite: !!n.favorite
         };
     });
 
@@ -190,11 +192,13 @@ function displayNotes(){
         const subjectHtml = note.subject ? `<div class="note-subject">Subject: ${escapeHtml(note.subject)}</div>` : '';
         const tagsHtml = (note.tags || []).length ? `<div class="note-tags">${note.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : '';
 
-        // Pin button
+        // Favorite & Pin buttons
+        const favBtn = `<button class="favorite-btn ${note.favorite ? 'active' : ''}" onclick="toggleFavorite('${note.id}')" aria-label="Toggle favorite">${note.favorite ? '★' : '☆'}</button>`;
         const pinBtn = `<button class="pin-btn" onclick="togglePin('${note.id}')" aria-label="Toggle pin">${note.pinned ? 'Unpin' : 'Pin'}</button>`;
 
         const noteHtml = `
             <div class="note">
+                ${favBtn}
                 ${pinBtn}
                 ${titleHtml}
                 ${contentHtml}
@@ -271,6 +275,14 @@ function togglePin(id){
     const idx = notes.findIndex(n=>String(n.id) === String(id));
     if(idx === -1) return;
     notes[idx].pinned = !notes[idx].pinned;
+    localStorage.setItem('notes', JSON.stringify(notes));
+    displayNotes();
+}
+
+function toggleFavorite(id){
+    const idx = notes.findIndex(n=>String(n.id) === String(id));
+    if(idx === -1) return;
+    notes[idx].favorite = !notes[idx].favorite;
     localStorage.setItem('notes', JSON.stringify(notes));
     displayNotes();
 }
