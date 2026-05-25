@@ -191,6 +191,23 @@ textarea{
     display:inline-block;
 }
 
+.pinned-section{ margin-top:16px }
+.pinned-section h2{ margin:0 0 8px 0; font-size:16px }
+
+.pin-btn{
+    position:absolute;
+    left:10px;
+    top:8px;
+    background:transparent;
+    border:1px solid var(--border-color);
+    color:var(--text-color);
+    padding:4px 8px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.note{ position:relative }
+
 /* Markdown rendering basics */
 .live-preview h1, .note-content h1{ font-size:20px; margin:6px 0 }
 .live-preview h2, .note-content h2{ font-size:18px; margin:6px 0 }

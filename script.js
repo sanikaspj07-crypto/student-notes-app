@@ -76,18 +76,22 @@ function normalizeNotes(){
         if(typeof n === 'string'){
             const lines = n.split('\n').map(l=>l.trim()).filter(Boolean);
             return {
+                id: Date.now() + Math.floor(Math.random()*1000),
                 title: lines[0] || '',
                 content: lines.slice(1).join('\n') || lines[0] || '',
                 tags: [],
-                subject: ''
+                subject: '',
+                pinned: false
             };
         }
         // Already structured, ensure keys exist
         return {
+            id: n.id || (Date.now() + Math.floor(Math.random()*1000)),
             title: n.title || '',
             content: n.content || '',
             tags: Array.isArray(n.tags) ? n.tags : (n.tags ? String(n.tags).split(',').map(s=>s.trim()).filter(Boolean) : []),
-            subject: n.subject || ''
+            subject: n.subject || '',
+            pinned: !!n.pinned
         };
     });
 
@@ -107,10 +111,12 @@ function addNote() {
     }
 
     const newNote = {
+        id: Date.now(),
         title: title,
         content: noteText,
         tags: tagsText ? tagsText.split(',').map(t=>t.trim()).filter(Boolean) : [],
-        subject: subjectText || ''
+        subject: subjectText || '',
+        pinned: false
     };
 
     notes.unshift(newNote);
@@ -131,13 +137,16 @@ function addNote() {
 
 function displayNotes(){
     let container = document.getElementById("notesContainer");
+    let pinnedContainer = document.getElementById('pinnedContainer');
+    const pinnedSection = document.getElementById('pinnedSection');
     container.innerHTML = "";
+    pinnedContainer.innerHTML = "";
 
     const q = searchQuery.trim();
     const tagsFilter = filterTags.map(t=>t.toLowerCase());
     const subjectFilter = filterSubject.toLowerCase();
 
-    notes.forEach((note,index)=>{
+    notes.forEach((note)=>{
         const combined = (note.title + ' ' + note.content).toLowerCase();
 
         // Filter by search query
@@ -181,16 +190,33 @@ function displayNotes(){
         const subjectHtml = note.subject ? `<div class="note-subject">Subject: ${escapeHtml(note.subject)}</div>` : '';
         const tagsHtml = (note.tags || []).length ? `<div class="note-tags">${note.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : '';
 
-        container.innerHTML += `
+        // Pin button
+        const pinBtn = `<button class="pin-btn" onclick="togglePin('${note.id}')" aria-label="Toggle pin">${note.pinned ? 'Unpin' : 'Pin'}</button>`;
+
+        const noteHtml = `
             <div class="note">
+                ${pinBtn}
                 ${titleHtml}
                 ${contentHtml}
                 ${subjectHtml}
                 ${tagsHtml}
-                <button class="delete-btn" onclick="deleteNote(${index})" aria-label="Delete note">X</button>
+                <button class="delete-btn" onclick="deleteNote('${note.id}')" aria-label="Delete note">X</button>
             </div>
         `;
+
+        if(note.pinned){
+            pinnedContainer.innerHTML += noteHtml;
+        } else {
+            container.innerHTML += noteHtml;
+        }
     });
+
+    // Show or hide pinned section
+    if(pinnedContainer.children.length){
+        pinnedSection.style.display = '';
+    } else {
+        pinnedSection.style.display = 'none';
+    }
 }
 
 // Walk DOM and wrap matching text in <mark> elements (case-insensitive)
@@ -227,8 +253,10 @@ function highlightInElement(element, query){
     });
 }
 
-function deleteNote(index){
-    notes.splice(index,1);
+function deleteNote(id){
+    const idx = notes.findIndex(n=>String(n.id) === String(id));
+    if(idx === -1) return;
+    notes.splice(idx,1);
 
     localStorage.setItem(
         "notes",
@@ -236,6 +264,14 @@ function deleteNote(index){
     );
 
     refreshFilters();
+    displayNotes();
+}
+
+function togglePin(id){
+    const idx = notes.findIndex(n=>String(n.id) === String(id));
+    if(idx === -1) return;
+    notes[idx].pinned = !notes[idx].pinned;
+    localStorage.setItem('notes', JSON.stringify(notes));
     displayNotes();
 }
 
