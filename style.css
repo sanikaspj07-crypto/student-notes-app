@@ -69,3 +69,55 @@ button:hover{
     padding:5px 10px;
     cursor:pointer;
 }
+
+.backup-panel {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px dashed #ddd;
+    border-radius: 5px;
+    background: #fafafa;
+}
+
+.backup-panel h3 {
+    font-size: 11px;
+    color: #777;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.backup-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Unified style rule for both the button and the label */
+.backup-btn {
+    flex: 1;
+    display: inline-block;
+    text-align: center;
+    background: #f0f0f0;
+    color: #444;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px 0; /* Vertical padding only to ensure matching heights */
+    font-size: 13px;
+    margin: 10px 0px 0px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease-in-out;
+    box-sizing: border-box; /* Eliminates box model variations */
+    font-family: inherit;
+}
+
+.backup-btn:hover {
+    background: #e5e5e5;
+    border-color: #bbb;
+    color: #222;
+}
+
+.backup-btn:active {
+    background: #dadada;
+}

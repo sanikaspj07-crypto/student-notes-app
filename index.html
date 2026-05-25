@@ -15,6 +15,15 @@
             <textarea id="noteInput" placeholder="Write your note here..."></textarea>
             <button onclick="addNote()">Add Note</button>
         </div>
+        
+        <div class="backup-panel">
+            <h3>Data Management</h3>
+            <div class="backup-actions">
+                <button onclick="exportNotes()" class="backup-btn">Export Backup</button>
+                <label for="importFile" class="backup-btn">Import Backup</label>
+                <input type="file" id="importFile" accept=".json" onchange="importNotes(event)" style="display: none;">
+            </div>
+        </div>
 
         <div id="notesContainer"></div>
     </div>
