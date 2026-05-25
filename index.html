@@ -86,6 +86,40 @@
           <input id="taskEmail" type="email" placeholder="student@example.com">
           <p class="hint">Optional: send an email reminder when the task deadline is approaching.</p>
         </div>
+    <div class="container">
+      <div class="input-area">
+        <input id="noteTitle" placeholder="Title (optional)" />
+        <textarea id="noteInput" placeholder="Write your note here... (Markdown supported)"></textarea>
+        <div class="input-row">
+          <input id="noteTags" placeholder="Tags (comma separated)" />
+          <input id="noteSubject" placeholder="Subject / Category (optional)" />
+        </div>
+        <div class="input-row actions">
+          <label><input type="checkbox" id="livePreviewToggle" /> Live preview</label>
+          <div style="display:flex; align-items:center; gap:10px">
+            <button onclick="addNote()">Add Note</button>
+            <span id="saveStatus" class="save-status" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div id="livePreview" class="live-preview" aria-hidden="true"></div>
+      </div>
+
+      <section class="search-area">
+        <input id="searchInput" placeholder="Search notes by title or content..." />
+        <div class="filters">
+          <input id="filterTags" placeholder="Filter by tag (comma separated)" />
+          <select id="filterSubject">
+            <option value="">All subjects</option>
+          </select>
+        </div>
+          <div class="suggested-tags-area">
+            <input id="newTagInput" placeholder="Add tag" />
+            <button id="addTagBtn" type="button">Add Tag</button>
+            <div id="suggestedTags" class="suggested-tags"></div>
+          </div>
+      </section>
+    </main>
 
         <button type="submit">Save Task</button>
       </form>
@@ -97,10 +131,22 @@
         <button id="clearCompletedBtn" type="button" class="secondary-btn">Clear completed reminders</button>
       </div>
       <div id="tasksContainer" class="tasks-grid"></div>
+    <div id="notesContainer"></div>
+  
+    <section id="pinnedSection" class="pinned-section" aria-labelledby="pinnedHeading" style="display:none">
+      <h2 id="pinnedHeading">Pinned Notes</h2>
+      <div id="pinnedContainer"></div>
+    </section>
+    <section id="favoritesSection" class="favorites-section" aria-labelledby="favoritesHeading" style="display:none">
+      <h2 id="favoritesHeading">Favorites</h2>
+      <div id="favoritesContainer"></div>
     </section>
   </div>
 
   <script src="script.js"></script>
+  <!-- Markdown renderer and sanitizer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
 </body>
 </html>
 
