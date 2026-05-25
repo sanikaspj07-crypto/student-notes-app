@@ -3,31 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notes App</title>
+    <title>Student Notes App</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
-        <h1>Notes App</h1>
+    <header class="site-header">
+        <h1>Student Notes App</h1>
+    </header>
 
-        <div class="input-area">
-            <textarea id="noteInput" placeholder="Write your note here..."></textarea>
-            <button onclick="addNote()">Add Note</button>
-        </div>
-        
-        <div class="backup-panel">
-            <h3>Data Management</h3>
-            <div class="backup-actions">
-                <button onclick="exportNotes()" class="backup-btn">Export Backup</button>
-                <label for="importFile" class="backup-btn">Import Backup</label>
-                <input type="file" id="importFile" accept=".json" onchange="importNotes(event)" style="display: none;">
+    <div class="container">
+        <main class="main-content">
+            <div class="input-area">
+                <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+                <button onclick="addNote()">Add Note</button>
             </div>
-        </div>
+            
+            <div class="backup-panel">
+                <h3>Data Management</h3>
+                <div class="backup-actions">
+                    <button onclick="exportNotes()" class="backup-btn">Export Backup</button>
+                    <label for="importFile" class="backup-btn">Import Backup</label>
+                    <input type="file" id="importFile" accept=".json" onchange="importNotes(event)" style="display: none;">
+                </div>
+            </div>
+        </main>
 
         <div id="notesContainer"></div>
+
+        <footer class="site-footer">
+            <p>© 2026 Student Notes App. All rights reserved.</p>
+        </footer>
     </div>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
