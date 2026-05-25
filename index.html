@@ -25,7 +25,10 @@
         </div>
         <div class="input-row actions">
           <label><input type="checkbox" id="livePreviewToggle" /> Live preview</label>
-          <button onclick="addNote()">Add Note</button>
+          <div style="display:flex; align-items:center; gap:10px">
+            <button onclick="addNote()">Add Note</button>
+            <span id="saveStatus" class="save-status" aria-live="polite"></span>
+          </div>
         </div>
 
         <div id="livePreview" class="live-preview" aria-hidden="true"></div>

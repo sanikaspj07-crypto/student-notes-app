@@ -184,6 +184,13 @@ textarea{
     overflow:auto;
 }
 
+.save-status{
+    font-size:13px;
+    color:var(--muted-text-color);
+    min-width:80px;
+    display:inline-block;
+}
+
 /* Markdown rendering basics */
 .live-preview h1, .note-content h1{ font-size:20px; margin:6px 0 }
 .live-preview h2, .note-content h2{ font-size:18px; margin:6px 0 }

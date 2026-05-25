@@ -2,6 +2,65 @@ let notes = JSON.parse(localStorage.getItem("notes")) || [];
 
 const THEME_KEY = "theme";
 
+// Auto-save configuration
+const AUTO_SAVE_KEY = 'draft';
+const AUTO_SAVE_DELAY = 2000; // ms of inactivity before saving
+let autoSaveTimer = null;
+
+function scheduleAutoSave(){
+    const statusEl = document.getElementById('saveStatus');
+    if(statusEl) statusEl.textContent = 'Saving...';
+    if(autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(()=>{
+        saveDraft();
+        if(statusEl) {
+            const time = new Date();
+            statusEl.textContent = 'Saved';
+            // briefly show saved then clear after 2s
+            setTimeout(()=>{ if(statusEl) statusEl.textContent = ''; }, 2000);
+        }
+        autoSaveTimer = null;
+    }, AUTO_SAVE_DELAY);
+}
+
+function saveDraft(){
+    const title = document.getElementById('noteTitle')?.value || '';
+    const content = document.getElementById('noteInput')?.value || '';
+    const tags = document.getElementById('noteTags')?.value || '';
+    const subject = document.getElementById('noteSubject')?.value || '';
+
+    const draft = {
+        title, content, tags, subject, savedAt: Date.now()
+    };
+    try{ localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(draft)); }catch(e){ console.warn('Failed to save draft', e); }
+}
+
+function restoreDraft(){
+    try{
+        const raw = localStorage.getItem(AUTO_SAVE_KEY);
+        if(!raw) return false;
+        const draft = JSON.parse(raw);
+        // If editor already has content, skip auto-restoring to avoid overwriting
+        const currentContent = document.getElementById('noteInput')?.value || '';
+        const currentTitle = document.getElementById('noteTitle')?.value || '';
+        if(currentContent || currentTitle) return false;
+
+        if(draft.title) document.getElementById('noteTitle').value = draft.title;
+        if(draft.content) document.getElementById('noteInput').value = draft.content;
+        if(draft.tags) document.getElementById('noteTags').value = draft.tags;
+        if(draft.subject) document.getElementById('noteSubject').value = draft.subject;
+
+        const statusEl = document.getElementById('saveStatus');
+        if(statusEl) statusEl.textContent = 'Restored draft';
+        setTimeout(()=>{ if(statusEl) statusEl.textContent = ''; }, 2000);
+        return true;
+    }catch(e){ return false; }
+}
+
+function clearDraft(){
+    try{ localStorage.removeItem(AUTO_SAVE_KEY); }catch(e){}
+}
+
 // UI state
 let searchQuery = "";
 let filterTags = [];
@@ -65,6 +124,9 @@ function addNote() {
 
     refreshFilters();
     displayNotes();
+
+    // Clear any saved draft after successful save
+    clearDraft();
 }
 
 function displayNotes(){
@@ -195,6 +257,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const livePreviewToggle = document.getElementById('livePreviewToggle');
     const livePreview = document.getElementById('livePreview');
     const noteInput = document.getElementById('noteInput');
+    const titleInput = document.getElementById('noteTitle');
+    const tagsInput = document.getElementById('noteTags');
+    const subjectInput = document.getElementById('noteSubject');
+    const saveStatus = document.getElementById('saveStatus');
 
     if(searchInput){
         searchInput.addEventListener('input', (e)=>{
@@ -219,6 +285,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     refreshFilters();
+    // Restore any unsaved draft if present
+    restoreDraft();
+    // Wire autosave to inputs
+    [noteInput, titleInput, tagsInput, subjectInput].forEach(inp=>{
+        if(!inp) return;
+        inp.addEventListener('input', ()=>{
+            scheduleAutoSave();
+        });
+    });
     // Live preview handling
     if(noteInput && livePreview && livePreviewToggle){
         const updatePreview = () => {
