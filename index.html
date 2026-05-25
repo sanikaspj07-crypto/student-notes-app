@@ -3,30 +3,101 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notes App</title>
+  <title>Student Task Manager</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <header class="app-header">
-      <h1>Notes App</h1>
-
-    <header class="site-header">
-        <h1>Student Notes App</h1>
+      <div>
+        <p class="eyebrow">Task &amp; Deadline Manager</p>
+        <h1>Student Task Manager</h1>
+      </div>
+      <div class="notification-panel">
+        <div class="notification-status">
+          <span>Browser notifications:</span>
+          <strong id="notificationStatus">loading...</strong>
+        </div>
+        <button id="requestPermissionBtn" type="button">Enable Notifications</button>
+      </div>
     </header>
 
-    <div class="container">
-        <div class="input-area">
-            <textarea id="noteInput" placeholder="Write your note here..."></textarea>
-            <button onclick="addNote()">Add Note</button>
+    <section class="panel notification-settings-panel">
+      <div class="section-header">
+        <h2>Notification settings</h2>
+      </div>
+      <div class="settings-grid">
+        <label class="setting-row">
+          <input id="browserNotificationsToggle" type="checkbox">
+          Enable browser notifications
+        </label>
+
+        <label class="setting-row">
+          <input id="emailRemindersToggle" type="checkbox">
+          Enable email reminders
+        </label>
+
+        <div class="field-row">
+          <label for="defaultReminderInterval">Default reminder time</label>
+          <select id="defaultReminderInterval">
+            <option value="1440">1 day before</option>
+            <option value="720">12 hours before</option>
+            <option value="360">6 hours before</option>
+            <option value="60">1 hour before</option>
+            <option value="30">30 minutes before</option>
+          </select>
         </div>
-    </main>
+      </div>
+    </section>
 
-    <footer class="site-footer">
-        <p>© 2026 Student Notes App. All rights reserved.</p>
-    </footer>
+    <section class="panel">
+      <h2>Add a task</h2>
+      <form id="taskForm" class="task-form">
+        <div class="field-row">
+          <label for="taskTitle">Task title</label>
+          <input id="taskTitle" type="text" placeholder="Math homework" required>
+        </div>
 
-    <div id="notesContainer"></div>
+        <div class="field-row">
+          <label for="taskDescription">Description</label>
+          <textarea id="taskDescription" rows="4" placeholder="Write a short summary..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <div class="field-row half-width">
+            <label for="taskDeadline">Deadline</label>
+            <input id="taskDeadline" type="datetime-local" required>
+          </div>
+
+          <div class="field-row half-width">
+            <label for="taskReminder">Reminder interval</label>
+            <select id="taskReminder">
+              <option value="1440">1 day before</option>
+              <option value="720">12 hours before</option>
+              <option value="360">6 hours before</option>
+              <option value="60">1 hour before</option>
+              <option value="30">30 minutes before</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label for="taskEmail">Email reminder address</label>
+          <input id="taskEmail" type="email" placeholder="student@example.com">
+          <p class="hint">Optional: send an email reminder when the task deadline is approaching.</p>
+        </div>
+
+        <button type="submit">Save Task</button>
+      </form>
+    </section>
+
+    <section class="panel" id="tasksSection">
+      <div class="section-header">
+        <h2>Upcoming tasks</h2>
+        <button id="clearCompletedBtn" type="button" class="secondary-btn">Clear completed reminders</button>
+      </div>
+      <div id="tasksContainer" class="tasks-grid"></div>
+    </section>
   </div>
 
   <script src="script.js"></script>
