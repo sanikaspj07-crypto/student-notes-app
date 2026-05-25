@@ -412,7 +412,8 @@ button:focus-visible{
 
 /* Footer styles */
 .site-footer{
-    width:680px;
+    width:100%;
+    max-width:680px;
     background:white;
     color:#666;
     padding:12px 20px;
@@ -427,7 +428,8 @@ button:focus-visible{
 .main-content{
     display:flex;
     gap:20px;
-    width:680px;
+    width:100%;
+    max-width:680px;
     align-items:flex-start;
 }
 
