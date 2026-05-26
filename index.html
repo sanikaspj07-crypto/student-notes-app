@@ -22,12 +22,23 @@
             <textarea id="noteInput" placeholder="Write your note here..."></textarea>
 
     <main class="main-content">
+      <aside class="sidebar">
+        <h3>Folders</h3>
+        <div id="foldersTree"></div>
+        <div style="margin-top:10px; display:flex; gap:8px">
+          <input id="newFolderName" placeholder="New folder name" style="flex:1; padding:6px" />
+          <button id="addFolderBtn" type="button">Add</button>
+        </div>
+      </aside>
       <div class="input-area">
         <input id="noteTitle" placeholder="Title (optional)" />
         <textarea id="noteInput" placeholder="Write your note here... (Markdown supported)"></textarea>
         <div class="input-row">
           <input id="noteTags" placeholder="Tags (comma separated)" />
           <input id="noteSubject" placeholder="Subject / Category (optional)" />
+          <select id="noteFolder" aria-label="Folder" title="Folder">
+            <option value="">No folder</option>
+          </select>
         </div>
         <div class="input-row actions">
           <label><input type="checkbox" id="livePreviewToggle" /> Live preview</label>

@@ -72,6 +72,9 @@ let searchQuery = "";
 let filterTags = [];
 let filterSubject = "";
 let globalTags = [];
+// Folder model: simple parent-relation tree
+let folders = JSON.parse(localStorage.getItem('folders')) || [];
+let currentFolder = null; // currently selected folder id (string)
 
 const TAGS_KEY = 'allTags';
 
@@ -160,6 +163,7 @@ function addNote() {
     let noteText = input.value.trim();
     let tagsText = document.getElementById('noteTags').value.trim();
     let subjectText = document.getElementById('noteSubject').value.trim();
+    let folderId = document.getElementById('noteFolder')?.value || '';
 
     if(noteText === ""){
         alert("Please enter a note");
@@ -183,6 +187,7 @@ function addNote() {
         content: noteText,
         tags: tagsText ? tagsText.split(',').map(t=>t.trim()).filter(Boolean) : [],
         subject: subjectText || '',
+        folderId: folderId || '',
         pinned: false
     };
 
@@ -195,6 +200,7 @@ function addNote() {
     document.getElementById('noteInput').value = '';
     document.getElementById('noteTags').value = '';
     document.getElementById('noteSubject').value = '';
+    const folderSelect = document.getElementById('noteFolder'); if(folderSelect) folderSelect.value = '';
 
     // record new note in recent history and refresh UI
     try{ recordRecent(newNote); }catch(e){}
@@ -243,6 +249,12 @@ function displayNotes(){
         // Filter by subject
         if(subjectFilter){
             if((note.subject || '').toLowerCase() !== subjectFilter) return;
+        }
+
+        // Filter by folder (include descendants)
+        if(currentFolder){
+            const allowed = getDescendantFolderIds(currentFolder).concat([String(currentFolder)]);
+            if(!allowed.includes(String(note.folderId || ''))) return;
         }
 
         const titleHtml = note.title ? `<div class="note-title">${escapeHtml(note.title)}</div>` : '';
@@ -525,6 +537,10 @@ function refreshFilters(){
     const current = select.value;
     select.innerHTML = '<option value="">All subjects</option>' + subjects.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
     select.value = current || '';
+
+    // populate folder select for note creation and ensure folders are rendered
+    populateFolderSelect();
+    renderFolders();
 }
 
 // Search and filter input wiring
@@ -585,6 +601,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         newTagInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); addTagBtn.click(); } });
     }
+    // Wire folder add button
+    const newFolderInput = document.getElementById('newFolderName');
+    const addFolderBtn = document.getElementById('addFolderBtn');
+    if(addFolderBtn && newFolderInput){
+        addFolderBtn.addEventListener('click', ()=>{
+            const v = (newFolderInput.value||'').trim();
+            if(!v) return;
+            addFolder(v, '');
+            newFolderInput.value = '';
+        });
+        newFolderInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); addFolderBtn.click(); } });
+    }
+    // Render folders and populate selects on load
+    try{ renderFolders(); populateFolderSelect(); }catch(e){}
     // Live preview handling
     if(noteInput && livePreview && livePreviewToggle){
         const updatePreview = () => {
@@ -688,6 +718,83 @@ function highlightHtml(text, query){
 // ---------------------
 // Minimal Recent History
 // ---------------------
+// ---------------------
+// Minimal Folder support
+// ---------------------
+function saveFolders(){
+    try{ localStorage.setItem('folders', JSON.stringify(folders)); }catch(e){}
+}
+
+function addFolder(name, parentId){
+    if(!name || !name.trim()) return;
+    const id = String(Date.now() + Math.floor(Math.random()*1000));
+    folders.push({ id, name: name.trim(), parent: parentId || '' });
+    saveFolders();
+    renderFolders();
+    populateFolderSelect();
+}
+
+function getChildren(parentId){
+    return folders.filter(f=> (f.parent||'') === String(parentId));
+}
+
+function renderFolders(containerId = 'foldersTree'){
+    const container = document.getElementById(containerId);
+    if(!container) return;
+    const build = (parentId) => {
+        const children = getChildren(parentId);
+        if(!children.length) return '';
+        return `<ul class="folder-list">${children.map(c=>`<li class="folder-item ${String(c.id)===String(currentFolder)?'selected':''}">
+            <span class="name" onclick="selectFolder('${c.id}')">${escapeHtml(c.name)}</span>
+            <span class="folder-actions">
+              <button onclick="promptAddSub('${c.id}')">Add sub</button>
+            </span>
+            ${build(c.id)}
+        </li>`).join('')}</ul>`;
+    };
+    container.innerHTML = build('') || '<div class="muted">No folders</div>';
+}
+
+function promptAddSub(parentId){
+    const name = prompt('Subfolder name:');
+    if(!name) return;
+    addFolder(name, parentId);
+}
+
+function selectFolder(id){
+    currentFolder = id || null;
+    // highlight
+    renderFolders();
+    // set filter and refresh
+    displayNotes();
+    // set folder selection in note form
+    const noteFolder = document.getElementById('noteFolder');
+    if(noteFolder) noteFolder.value = id || '';
+}
+
+function getDescendantFolderIds(id){
+    const res = [];
+    const walk = (pid)=>{
+        const children = getChildren(pid);
+        children.forEach(c=>{ res.push(String(c.id)); walk(c.id); });
+    };
+    walk(id);
+    return res;
+}
+
+function populateFolderSelect(){
+    const sel = document.getElementById('noteFolder');
+    if(!sel) return;
+    const buildOptions = (parentId, prefix='') => {
+        const children = getChildren(parentId);
+        return children.map(c=>{
+            const sub = buildOptions(c.id, prefix + '—');
+            return `<option value="${c.id}">${escapeHtml(prefix + ' ' + c.name)}</option>` + sub.join('');
+        }).flat();
+    };
+    const opts = ['<option value="">No folder</option>'].concat(buildOptions(''));
+    sel.innerHTML = opts.join('');
+}
 function recordRecent(note){
     if(!note) return;
     try{

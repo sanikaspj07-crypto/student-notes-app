@@ -699,6 +699,15 @@ button:focus-visible{
     font-weight:600;
 }
 
+/* Folder tree minimal styles */
+.sidebar h3{ margin:0 0 8px 0; font-size:14px }
+.folder-list{ list-style:none; padding-left:8px }
+.folder-item{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 4px; border-radius:6px }
+.folder-item .name{ cursor:pointer; color:var(--text-color) }
+.folder-item.selected{ background: color-mix(in srgb, var(--primary-bg) 8%, transparent); }
+.folder-actions button{ margin-left:6px; padding:4px 6px; font-size:12px }
+
+
 /* Recent history panel (minimal) */
 .recent-section{ margin-top:16px }
 .recent-section h2{ margin:0 0 8px 0; font-size:16px }
