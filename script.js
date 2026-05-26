@@ -191,6 +191,8 @@ function addNote() {
     document.getElementById('noteTags').value = '';
     document.getElementById('noteSubject').value = '';
 
+    // record new note in recent history and refresh UI
+    try{ recordRecent(newNote); }catch(e){}
     refreshFilters();
     displayNotes();
 
@@ -676,4 +678,76 @@ function highlightHtml(text, query){
     const re = new RegExp(`(${q})`, 'ig');
     return escapeHtml(text).replace(re, '<mark class="highlight">$1</mark>');
 }
+
+// ---------------------
+// Minimal Recent History
+// ---------------------
+function recordRecent(note){
+    if(!note) return;
+    try{
+        const raw = localStorage.getItem('recentNotes');
+        const list = raw ? JSON.parse(raw) : [];
+        const id = String(note.id || note._id || Date.now());
+        // remove existing entry for id
+        const filtered = list.filter(i=> String(i.id) !== id);
+        filtered.unshift({ id, title: note.title || (note.content||'').slice(0,60), ts: Date.now() });
+        // limit to 10
+        const sliced = filtered.slice(0,10);
+        localStorage.setItem('recentNotes', JSON.stringify(sliced));
+        renderRecent();
+    }catch(e){ console.warn('recordRecent error', e); }
+}
+
+function renderRecent(){
+    const container = document.getElementById('recentContainer');
+    if(!container) return;
+    try{
+        const raw = localStorage.getItem('recentNotes');
+        const list = raw ? JSON.parse(raw) : [];
+        if(!list.length){ container.innerHTML = '<div class="empty-state">No recent notes yet.</div>'; return; }
+        container.innerHTML = list.map(item=>{
+            const time = new Date(item.ts).toLocaleString();
+            const title = escapeHtml(item.title || 'Untitled');
+            return `
+                <div class="recent-item">
+                    <div>
+                        <div class="title">${title}</div>
+                        <div class="meta">${time}</div>
+                    </div>
+                    <div>
+                        <button class="open-btn" onclick="openNote('${item.id}')">Open</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }catch(e){ container.innerHTML = '<div class="empty-state">Unable to load recent notes.</div>'; }
+}
+
+function openNote(id){
+    if(!id) return;
+    const idx = notes.findIndex(n=> String(n.id) === String(id));
+    if(idx === -1) {
+        alert('Note not found');
+        return;
+    }
+    const note = notes[idx];
+    // populate editor
+    const titleEl = document.getElementById('noteTitle');
+    const inputEl = document.getElementById('noteInput');
+    const tagsEl = document.getElementById('noteTags');
+    const subjectEl = document.getElementById('noteSubject');
+    if(titleEl) titleEl.value = note.title || '';
+    if(inputEl) inputEl.value = note.content || '';
+    if(tagsEl) tagsEl.value = (note.tags || []).join(', ');
+    if(subjectEl) subjectEl.value = note.subject || '';
+    // focus the editor
+    if(inputEl) inputEl.focus();
+    // record that user opened this note
+    try{ recordRecent(note); }catch(e){}
+}
+
+// Render recent on load
+document.addEventListener('DOMContentLoaded', ()=>{
+    try{ renderRecent(); }catch(e){}
+});
 

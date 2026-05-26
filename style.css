@@ -538,3 +538,29 @@ button:focus-visible{
     font-weight:600;
 }
 
+/* Recent history panel (minimal) */
+.recent-section{ margin-top:16px }
+.recent-section h2{ margin:0 0 8px 0; font-size:16px }
+.recent-container{ display:flex; flex-direction:column; gap:8px }
+.recent-item{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    align-items:center;
+    background:var(--surface-2-color);
+    padding:8px 10px;
+    border-radius:6px;
+    font-size:13px;
+    color:var(--text-color);
+}
+.recent-item .meta{ color:var(--muted-text-color); font-size:12px }
+.open-btn{
+    position:relative;
+    background:transparent;
+    border:1px solid var(--border-color);
+    padding:6px 8px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+
